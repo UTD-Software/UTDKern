@@ -1,6 +1,6 @@
 #ifndef __STDIO_H
 #define __STDIO_H
-#define STDIN -2
+#define STDIN 0
 void puts(const char *str);
 char getc(int fd);
 void putc(char c);

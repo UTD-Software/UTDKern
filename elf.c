@@ -44,7 +44,7 @@ void load_stage3_1(){
 		bios_readdisk(buf,*(uint8_t*)0x50,0,i,0);
 		
 		if(buf[0] == 0x7f && buf[1] == 'W' && buf[2] == 'O' && buf[3] == 'R' && buf[4] == 'M'){
-			_bios_readdisk(0xA000,*(uint8_t*)0x50,30,0,0,i+buf[5]+1);
+			_bios_readdisk(0xA000,*(uint8_t*)0x50,44,0,0,i+buf[5]+1);
 			_bios_readdisk(0xF000,*(uint8_t*)0x50,buf[5],0,0,i+1);
 			puts("Exec\n");
 			break;

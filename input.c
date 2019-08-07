@@ -9,7 +9,7 @@ int getIndx(int c){
 int kbd_init(){
 }
 
-char getc(int fd){
+unsigned char getc(int fd){
 	if(fd == STDIN){
 a:;		int b = inb(0x60);
 		int prev = b;

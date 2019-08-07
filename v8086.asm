@@ -1,10 +1,16 @@
-enter_v86:
-   mov epb, esp               ; save stack pointer
+global enterV8086
+global exitV8086
+section .text
+enterV8086:
+   mov ebp, esp               ; save stack pointer
 
-   push dword  [ebp+4]        ; ss
-   push dword  [ebp+8]        ; esp
+   push dword  ss        ; ss
+   push dword  esp        ; esp
    pushfd                     ; eflags
    or dword [esp], (1 << 17)  ; set VM flags
-   push dword [ebp+12]        ; cs
-   push dword  [ebp+16]       ; eip
+   push dword cs        ; cs
+   mov eax,[esp]
+   push dword  eax      ; eip
    iret
+exitV8086:
+	iret

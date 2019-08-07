@@ -18,6 +18,9 @@ inc bx
 jmp lbl
 r:ret
 _start:
+mov ah,0
+mov al,3
+int 0x10
 mov bx,msg
 call puts_bios
 mov ax,ds

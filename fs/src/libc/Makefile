@@ -1,4 +1,4 @@
-OBJS=puts.o crt0.o malloc.o exec.o crti.o crtn.o  putc.o sep.o bzero.o putx.o string.o gets.o getc.o free.o
+OBJS=puts.o crt0.o malloc.o exec.o crti.o crtn.o breakpoint.o putc.o sep.o bzero.o putx.o string.o gets.o getc.o free.o
 LIBS=libc.a
 CC=i386-elf-gcc
 AS=nasm
@@ -34,6 +34,8 @@ all:
 	@${CC} -c putc.c -o putc.o ${CFLAGS}
 	@echo "(CC) ${PWD}/putx.o"
 	@${CC} -c putx.c -o putx.o ${CFLAGS}
+	@echo "(CC) ${PWD}/breakpoint.o"
+	@${CC} -c breakpoint.c -o breakpoint.o ${CFLAGS}
 	@echo "(AR) ${PWD}/libc.a"
 	
 	@${AR} rcs libc.a ${OBJS}

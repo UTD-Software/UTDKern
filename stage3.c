@@ -11,6 +11,10 @@ void bzero(void *buf,unsigned int n){
 #define KVERSION "0.0.0-r0"
 int main(){
 	clear();
+	init_page();
+	*(uint8_t*)0x600 = 0xc3;
+//	setMode(getMode(1920,1080,24));
+//	int10h_ldr();
 	puts("CPU Build Version: ");
 	puts(CPU);
 	puts("\nKernel ");
@@ -70,19 +74,18 @@ a:;
 	asm("mov $1,%ah");
 	asm("int $0x80");
 	char *arr[] = {"/init"};
-
 	exec(arr[0],1,arr);
 	panic("Nothing to do");
 }
+void breakpoint(){
+	void (*func)() = 0x600;
+	func();
+}
 void panic(char *message){
-	int address = 0;
-	asm("movl 4(%ebp),%eax");
-	asm("movl %%eax,%0" : "=m"(address));
-	puts("0x");
-	putx(address);
-	puts(":panic(");
+	puts("panic(");
 	puts(message);
 	puts(")\nA fatal error has occured\n");
 	asm("cli");
 	asm("hlt");
 }
+

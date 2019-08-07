@@ -1,4 +1,7 @@
 #include "lib.h"
+void strncpy(char *dest,const char *src,unsigned long n){
+	memcpy(dest,src,n);
+}
 char *strcpy(char *dest,const char *src){
 	int i = 0;
 	while(src[i] != 0){

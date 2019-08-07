@@ -7,7 +7,8 @@ void *malloc(unsigned short size){
 		if((pntr+size) < 0x9000){/*Overflow protection*/
 
 			puts("OUT OF MEMORY!!!!\n");
-			panic();
+//			puts("Cannot allocate size: 0x");
+//			putx(size);
 		}
 		if(pntr->alloc){
 			pntr+=sizeof(*pntr)+pntr->size;
@@ -35,11 +36,16 @@ void *malloc(unsigned short size){
 void *malloc(unsigned long size){
 	if(size == 0)
 		return malloc(1);
-	struct Mem *pntr = (struct Mem*)0x01000000;
+	struct Mem *pntr = (struct Mem*)0xC0000000;
 	while(1){
-		if((pntr + size) < (struct Mem*)0x00100000){
+		if(((uint32_t)pntr + size) < 0xC0000000){
 			puts("Out of memory\n");
-			panic();
+			puts("Size:0x");
+			putx(size);
+			puts(" pntr=0x");
+			putx((uint32_t)pntr);
+			puts("\n");
+			return 0;
 		}
 		if(pntr->alloc){
 			pntr+=sizeof(*pntr)+pntr->size;

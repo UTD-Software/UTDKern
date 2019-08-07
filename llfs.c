@@ -102,13 +102,13 @@ struct llfd *getAddressSpace(){
 }
 struct llfd *getllfd(int llfd){
 	struct llfd *pntr = getAddressSpace();
-	for(int i = 0; i < llfd;i++)
+	for(int i = 0; i < llfd-STDIN-1;i++)
 		pntr = pntr->nxt;
 	return pntr;
 }
 struct llfd *allocllfd(){
 	struct llfd *pntr = getAddressSpace();
-	int i = 0;
+	int i = STDIN+1;
 	while(pntr->nxt != 0){
 		pntr = pntr->nxt;
 	}
@@ -118,7 +118,7 @@ struct llfd *allocllfd(){
 }
 int getLLFD(struct llfd *l){
 	struct llfd *pntr = getAddressSpace();
-	int i = 0;
+	int i = STDIN+1;
 	while(pntr->nxt != 0){
 		if(pntr == l)
 		       return i;
@@ -206,6 +206,12 @@ int abs(int n){
 int llread(int fd,char *buf,unsigned int n){
 	if(fd < 0)
 		return -1;
+	if(fd == STDIN){
+		for(int i = 0; i < n;i++){
+			buf[i] = getc(STDIN);
+		}
+		return 1;
+	}
 	char *tbuf = malloc(1024);
 	struct llfd *llfd = getllfd(fd);
 	int j = 0;
@@ -227,7 +233,7 @@ int llread(int fd,char *buf,unsigned int n){
 
 		j+=sz;
 	}
-	free(tbuf);
+
 	return j;
 }
 int fsize(int fd){

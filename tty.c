@@ -8,6 +8,12 @@ char *vgabuf = (char*)0xb8000;
 uint8_t mkcolor(uint8_t a,uint8_t b){
 	return a | b << 4;
 }
+void getFreeLine(){
+	if(c == 0)
+		return;
+	r++;
+	c=0;
+}
 void clear(){
 	int i = 0;
 	for(i = 0; i < 80*25;i++)

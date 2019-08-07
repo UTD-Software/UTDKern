@@ -9,7 +9,7 @@ void puts(const char *str){
 
 	return;
 }
-#ifdef __PM
+
 int intlen(int i){
 	int ret = 0;
 	while(i > 0){
@@ -31,10 +31,9 @@ void puti(int i){
 	}
 
 }
-#endif
-#ifdef __PM
 void putb(uint8_t n){
-	for(int i = 0; i < 8;i++){
+	int i = 0;
+	for(i = 0; i < 8;i++){
 		putc(((n >> (8-i)) & 1)+'0');
 	}
 	putc('\n');
@@ -53,14 +52,25 @@ int xlen(int i){
 	}while(i > 0);
 	return ret;
 }
+void debug(char *task,char *info){
+#ifdef DEBUG
+	getFreeLine();
+	puts("[");
+	puts(task);
+	puts("]:");
+	puts(info);
+	puts("\n");
+#endif
+}
+#ifdef __PM
 void putx(int i){
-	char *pntr = malloc(intlen(i));
+	char pntr[xlen(i)];;
 	int size = xlen(i)-1;
+	int j =0;
 	if(i == 0){
 		puts("0");
 		return;
 	}
-	int j = 0;
 	while(i >= 0){
 		int c = i % 16;
 		pntr[size-j] = getx(c);
@@ -71,5 +81,6 @@ void putx(int i){
 			break;
 	}
 	puts(pntr);
+//	free(pntr);
 }
 #endif

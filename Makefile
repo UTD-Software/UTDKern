@@ -1,5 +1,5 @@
 OBJS = objs/stage2.o main.o objs/ulcmp.o  objs/getc.o objs/putc.o objs/elf.o objs/memcmp.o objs/gdt.o objs/memcpy.o  objs/getc.o objs/fat.o  objs/readdisk.o objs/string.o objs/malloc.o objs/puts.o objs/test.o objs/main.o objs/disk.o objs/getDiskGeo.o objs/bzero.o objs/writedisk.o
-STAGE3_OBJS = stage3.o inline.o idt.o ldr.o isr.o input.o llfs.o tmpfs.o memcmp.o string.o puts.o math.o objs/tty.o ata.o malloc.o
+STAGE3_OBJS = stage3.o inline.o v8086.o idt.o ldr.o mem.o isr.o input.o llfs.o tmpfs.o memcmp.o string.o puts.o math.o objs/tty.o ata.o malloc.o 
 LIBK_OBJS =  crt0.o cursor.o
 MATH_OBJS = math.o
 BINS = *.a *.bin *.elf *.img
@@ -7,8 +7,9 @@ ASM=nasm
 PWD=$(shell pwd)
 CC_16=bcc
 CFLAGS_16=-I. -DBLBUILD -DBCC -D__INTERNAL
-CFLAGS_X86_32=-Werror -nostdlib -ffreestanding -I. -DKERN -D__STANDALONE -Iinclude -std=gnu99
+CFLAGS_X86_32=-Werror -DDEBUG -nostdlib -ffreestanding -I. -DKERN -D__STANDALONE -Iinclude -std=gnu99
 LD_16=ld86
+LDFLAGS_X86_32=-Llibvesa -lvesa
 LD_32=i386-elf-gcc
 CFLAGS_HOST=-I.
 CC_HOST=gcc
@@ -22,9 +23,13 @@ all:
 	@${CC_HOST}  llfs.inscribe.c -o llfs.inscribe ${CFLAGS_HOST}
 	@echo "(CLEAN) ."
 	@rm -f *.o *.a *.so *.elf
-
+	@echo "(CC) mem.o"
+	@${CC} -c mem.c -o mem.o ${CFLAGS_X86_32} -DDEBUG
 	@make -C stage1
 	@make -C fs/src
+	 make -C libvesa
+	@echo "(AS) ${PWD}/v8086.o"
+	@${ASM} -f elf v8086.asm -o v8086.o
 	@echo "(AS) ${PWD}/ata.o"
 	@${ASM} -f elf ata.asm -o ata.o 
 	@echo "(CC) ${PWD}/objs/tty.o"
@@ -37,6 +42,8 @@ all:
 	@${ASM} -f as86 getDiskGeo.asm -o objs/getDiskGeo.o
 	@echo "(AS) ${PWD}/objs/gdt.o"
 	@${ASM} -f as86 gdt.asm -o objs/gdt.o
+	@echo "(AS) ${PWD}fs/kern/int10h.ko"
+	@${ASM} -f bin int10h.asm -o fs/kern/int10h.ko
 	@echo "(CC 16bit) ${PWD}/objs/bzero.o"
 	@${CC_16} -ansi -c bzero.c -o objs/bzero.o 
 	@echo "(CC 16bit) ${PWD}/objs/tmpfs.o"
@@ -131,7 +138,7 @@ all:
 	@echo "(CC) ${PWD}/input.o"
 	@${CC} -c input.c -o input.o ${CFLAGS_X86_32}
 	@echo "(CC) ${PWD}/puts.o"
-	@${CC} -c puts.c -o puts.o ${CFLAGS_X86_32} -D__PM
+	@${CC} -c puts.c -o puts.o ${CFLAGS_X86_32} -DDEBUG -D__PM
 	@echo "(CC) ${PWD}/stage3.o"
 	@${CC} -c stage3.c -o stage3.o ${CFLAGS_X86_32} -Wno-error
 	@echo "(CC) ${PWD}/llfs.o"
@@ -143,7 +150,7 @@ all:
 	@echo "(CC) ${PWD}/idt.o"
 	@${CC} -c idt.c -o idt.o ${CFLAGS_X86_32}
 	@echo "(LD) ${PWD}/stage3.elf"
-	@${CC} ${STAGE3_OBJS} -L. -lk -nostdlib -ffreestanding -o stage3.elf -Tlinker.2.ld
+	@${CC} ${STAGE3_OBJS} -L. -lk -nostdlib -ffreestanding ${LDFLAGS_X86_32} -o stage3.elf -Tlinker.2.ld
 	@cp *.bin *.elf objs/*.o fs/kern
 	@echo "(INSCRIBE FILE SYSTEM) ${PWD}/fs.img"
 	@./llfs.inscribe fs.img fs
