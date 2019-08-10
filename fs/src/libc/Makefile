@@ -1,4 +1,4 @@
-OBJS=puts.o crt0.o malloc.o exec.o crti.o debug.o crtn.o breakpoint.o putc.o sep.o bzero.o putx.o string.o gets.o getc.o free.o
+OBJS=puts.o crt0.o malloc.o opendir.o exec.o crti.o debug.o readSector.o crtn.o breakpoint.o putc.o sep.o bzero.o putx.o string.o gets.o getc.o free.o
 LIBS=libc.a
 CC=i386-elf-gcc
 AS=nasm
@@ -38,8 +38,11 @@ all:
 	@${CC} -c putx.c -o putx.o ${CFLAGS}
 	@echo "(CC) ${PWD}/breakpoint.o"
 	@${CC} -c breakpoint.c -o breakpoint.o ${CFLAGS}
+	@echo "(CC) ${PWD}/opendir.o"
+	@${CC} -c opendir.c -o opendir.o ${CFLAGS}
+	@echo "(CC) ${PWD}/readSector.o"
+	@${CC} -c readSector.c -o readSector.o ${CFLAGS}
 	@echo "(AR) ${PWD}/libc.a"
-	
 	@${AR} rcs libc.a ${OBJS}
 install:
 	cp crt0.o /usr/local/lib/i386-elf

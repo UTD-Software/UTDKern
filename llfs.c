@@ -46,6 +46,9 @@ char **sep(const char *dir,char c){
 	ret[k] = 0;
 	return ret;
 }
+int max(int a,int b){
+	return a > b ? a : b;
+}
 //Low level Open directory function
 struct Entry *__opendir(const char *dir){
 #ifdef __FS_DEBUG
@@ -67,7 +70,7 @@ struct Entry *__opendir(const char *dir){
 
 a:;while(1){
 		memcpy(ent,buf,sizeof(*ent));
-		if(strncmp(buf +sizeof(*ent),dirs[i],strlen(dirs[i])) == 0){
+		if(strcmp(buf +sizeof(*ent),dirs[i]) == 0){
 			break;
 		}
 		else if(ent->nsize == 0)

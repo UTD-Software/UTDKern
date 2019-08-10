@@ -10,6 +10,8 @@ extern putc
 extern getc
 extern putx
 extern sep
+extern llfs_ata_read_master
+extern __opendir
 cld
 push ebp
 mov ebp,esp
@@ -33,6 +35,10 @@ cmp ah,0x9
 je _putx
 cmp ah,0x0a
 je _sep
+cmp ah,0x0b
+je _opendir
+cmp ah,0x0c
+je readSector
 iret
 _putc:
 push ebx
@@ -97,5 +103,21 @@ push ecx
 push ebx
 call sep
 add esp,8
+pop ebp
+iret
+_opendir:
+push ebx
+call __opendir
+add esp,4
+pop ebp
+iret
+readSector:
+mov ax,[0x102]
+push ax
+push word [0x100]
+push ecx
+push ebx
+call llfs_ata_read_master
+add esp,12
 pop ebp
 iret
