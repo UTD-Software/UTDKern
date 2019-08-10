@@ -5,6 +5,7 @@ int main(int argc, char *argv[]){
 	breakpoint();
 	for(int i = 1; i < argc;i++){
 		puts(argv[i]);
+		breakpoint();
 		puts(" ");
 	}
 	breakpoint();

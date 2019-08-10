@@ -7,13 +7,13 @@ ASM=nasm
 PWD=$(shell pwd)
 CC_16=bcc
 CFLAGS_16=-I. -DBLBUILD -DBCC -D__INTERNAL
-CFLAGS_X86_32=-Werror -DDEBUG -nostdlib -ffreestanding -I. -DKERN -D__STANDALONE -Iinclude -std=gnu99
+CFLAGS_X86_32=-Werror -DDEBUG -D__PM -nostdlib -ffreestanding -I. -DKERN -D__STANDALONE -Iinclude -std=gnu99
 LD_16=ld86
 LDFLAGS_X86_32=-Llibvesa -lvesa
-LD_32=i386-elf-gcc
+LD_32=i386-elf-gcc -m32
 CFLAGS_HOST=-I.
 CC_HOST=gcc
-CC=i386-elf-gcc
+CC=i386-elf-gcc -m32
 CFLAGS_HOST=-I. -g
 PREFIX=i386-elf-
 all:
@@ -148,7 +148,7 @@ all:
 	@echo "(CC) ${PWD}/ldr.o"
 	@${CC} -c ldr.c -o ldr.o ${CFLAGS_X86_32} -DDEBUG
 	@echo "(CC) ${PWD}/idt.o"
-	@${CC} -c idt.c -o idt.o ${CFLAGS_X86_32}
+	@${CC} -c idt.c -o idt.o -Wno-error ${CFLAGS_X86_32} -Wno-error
 	@echo "(LD) ${PWD}/stage3.elf"
 	@${CC} ${STAGE3_OBJS} -L. -lk -nostdlib -ffreestanding ${LDFLAGS_X86_32} -o stage3.elf -Tlinker.2.ld
 	@cp *.bin *.elf objs/*.o fs/kern

@@ -1,5 +1,7 @@
+//Shitty PS/2 Keyboard Driver
 #include "lib.h"
 static int sca[] = {0x1e,0x30,0x2e,0x20,0x12,0x21,0x22,0x23,0x17,0x24,0x25,0x26,0x32,0x31,0x18,0x19,0x10,0x13,0x1f,0x14,0x16,0x2f,0x11,0x2d,0x15,0x2c};
+//Gets index of the scancode so it's easy to convert to alphanumeric values
 int getIndx(int c){
 	for(int i = 0; i < 26;i++)
 		if(c == sca[i])
@@ -8,7 +10,7 @@ int getIndx(int c){
 }
 int kbd_init(){
 }
-
+//Standard getc from file descriptor. Specify STDIN for keyboard input. So far havent implemented this for files. Waiting on new disk drivers
 unsigned char getc(int fd){
 	if(fd == STDIN){
 a:;		int b = inb(0x60);

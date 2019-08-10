@@ -2,7 +2,8 @@
 #include <stdint.h>
 #include "mem.h"
 uint32_t paged[1024] __attribute__((aligned(4096)));
-
+uint32_t curraddr;
+uint32_t naddr;
 void ldpgd(uint32_t *p);
 /*
  *Initializing paging
@@ -18,7 +19,7 @@ int init_page(){
 		paget[i] = addr | 0b11;
 	}
 	paged[0] = 0b11 | (uint32_t)paget;
-	addr = 0x01000000;
+	addr = 0x800000;
 	for(int i = 1; i < 5;i++){
 		uint32_t _paget[1024] __attribute__((aligned(4096)));
 		for(int j = 0; j < 1024;j++,addr+=4096){
@@ -28,9 +29,12 @@ int init_page(){
 	}
 	ldpgd(paged);
 	puts("Paging enabled\n");
-	map_page(0x010000000,0xC0000000);
-
+	map_page(0x400000,0xC0000000);
+	map_page(0x800000,0xC0400000);
+	curraddr = 0xF00000;
+	naddr = curraddr+4096*1024;
 }
+
 int pgalloc(){
 	for(int i = 0; i < 1024;i++)
 		if(paged[i] == 1)
@@ -58,12 +62,42 @@ void map_page(uint32_t paddr,uint32_t vaddr){
 	if(paged[indx] != 1)
 		return;
 	paged[indx] = (uint32_t)pt|3;
-
+	ldpgd(paged);
 	debug("paget","Registered page directory");
 }
-void *alloc_page(uint32_t vaddr){
-	uint8_t *buf = malloc(4096*1024);
+void alloc_page(uint32_t vaddr){
+	uint32_t indx = vaddr/1024/4096;
+	uint32_t pt[1024]__attribute__((aligned(4096)));
+	for(int i = 0; i < 1024;i++,curraddr+=4096){
+		pt[i] = (curraddr & 0xffffff00) | 3;
+	}
+	if(paged[indx] != 1)
+		return;
+	paged[indx] = ((uint32_t)pt & 0xffffff00) | 3;
+}
+void *allocNewPage(){
+	uint32_t indx = 0;
+	for(int i = 0x10; i < 1024;i++)
+		if(paged[i] == 1){
+			indx = i;
+			break;
+		}
+	putx(indx);
+	alloc_page(indx*4096*1024);
+	return (void*)(indx*4096*1024);
+}
 
-	map_page((uint32_t)buf,vaddr);
-	return buf;
+void program_memory_init(){
+	usermem = allocNewPage();
+	for(int i =0; i < 4096*1024;i++)
+		usermem[i] = 0;
+}
+void program_memory_set(uint32_t size){
+
+}
+void program_memory_destroy(uint32_t addr){
+//	dealloc_page(addr);
+}
+void dealloc_page(uint32_t addr){
+	paged[addr/4096/1024] = 1;
 }

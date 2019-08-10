@@ -52,7 +52,7 @@ int xlen(int i){
 	}while(i > 0);
 	return ret;
 }
-void debug(char *task,char *info){
+void debug(const char *task,const char *info){
 #ifdef DEBUG
 	getFreeLine();
 	puts("[");
@@ -63,24 +63,25 @@ void debug(char *task,char *info){
 #endif
 }
 #ifdef __PM
-void putx(int i){
-	char pntr[xlen(i)];;
+char* x2p(int i){
+	char *pntr = malloc(xlen(i));
 	int size = xlen(i)-1;
 	int j =0;
 	if(i == 0){
-		puts("0");
-		return;
+		return "Error";
 	}
 	while(i >= 0){
 		int c = i % 16;
 		pntr[size-j] = getx(c);
-//		putc(pntr[size-j-1]);
 		j++;
 		i/=16;
 		if(i == 0)
 			break;
 	}
-	puts(pntr);
-//	free(pntr);
+	return pntr;
+}
+void putx(int i){
+	puts("0x");
+	puts(x2p(i));
 }
 #endif

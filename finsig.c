@@ -1,3 +1,7 @@
+/*
+ * Final signature writer
+ * (c) 2019 Zachary James Schlotman
+ */
 #include <stdio.h>
 #include <stdlib.h>
 int main(int argc,char *argv[]){

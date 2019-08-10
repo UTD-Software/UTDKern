@@ -8,7 +8,8 @@ returnedmsg:db 'Returned to stage1! This should not happen!',0
 errmsg:db 'Error!',0
 loading:db 'Loading a.out into memory from disk...',0
 succ:db '*',0
-start:mov bx,succ
+start:
+mov bx,succ
 
 call puts_bios
 jmp _start
@@ -100,8 +101,7 @@ cntr:dd 0
 _start:
 mov bx,loading
 call puts_bios
-mov sp,0xffff
-mov bp,sp
+
 mov ax,ds
 mov es,ax
 mov ah,0x02

@@ -1,4 +1,14 @@
-#include "lib.h"
+/*
+ * Malloc shit
+ */
+#include <mem.h>
+#include <lib.h>
+#ifdef __PM
+void memory_init(){
+	for(int i = 0xC0000000; i < 0xC0400000;i++)
+		*(uint32_t*)i = 0;
+}
+#endif
 #ifndef __PM
 void *malloc(unsigned short size){
 	struct Mem *pntr = (struct Mem*)0x9000;
@@ -36,9 +46,9 @@ void *malloc(unsigned short size){
 void *malloc(unsigned long size){
 	if(size == 0)
 		return malloc(1);
-	struct Mem *pntr = (struct Mem*)0xC0000000;
+	struct Mem *pntr = (struct Mem*)(*userbit? usermem : 0xC0000000);
 	while(1){
-		if(((uint32_t)pntr + size) < 0xC0000000){
+		if(((uint32_t)pntr + size) < (*userbit ? usermem : 0xC0000000)){
 			puts("Out of memory\n");
 			puts("Size:0x");
 			putx(size);

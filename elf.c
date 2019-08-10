@@ -4,15 +4,17 @@
  * WORM Bootloader
  */
 #include <elf.h>
-#include <lib.h>
 #include <string.h>
+#include <lib.h>
 #ifdef __STANDALONE
+//Executes stage 3 bootloader
 void load_stage_3(){
-	void *pntr = (void*)0xA000;
+	void *pntr = (void*)0xA000;//Creat pointer to file data
 	Elf32_Ehdr *ehdr = (Elf32_Ehdr*)0xA000;
 	Elf32_Phdr *phdr = (Elf32_Phdr*)(0xA000 + (uint16_t)ehdr->e_phoff);
 	void (*func)();
 	int i = 0;
+	//Parse elf and move Loadable Phdrs into memory
 	for( i = 0; i < ehdr->e_phnum;i++){
 		if((uint16_t)phdr[i].p_type == PT_LOAD)
 			memcpy((uint16_t*)phdr[i].p_vaddr,(uint8_t*)pntr + (uint16_t)phdr[i].p_offset,phdr[i].p_memsz);
@@ -20,11 +22,12 @@ void load_stage_3(){
 	func = (void*)ehdr->e_entry;
 	func();
 }
-
+//I should probably just compile bzero.c into the kernel
 void bzero(void *pntr,unsigned int n){
 	for(int i = 0; i < n;i++)
 		*((uint8_t*)pntr + i)= 0;
 }
+//Remnents from the early days
 void _io_error(){
 	*(uint8_t*)0xb8000 = 'E';
 	*(uint8_t*)0xb8001 = 15;
@@ -35,6 +38,7 @@ void panic(){
 	puts("BL_PANIC");
 	while(1);
 }
+//Loads the file into memory
 void load_stage3_1(){
 	uint8_t *buf = 0xA000;
 	char sig[5];

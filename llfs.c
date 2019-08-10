@@ -1,10 +1,17 @@
+/*
+ * Oh god Oh Fuck
+ * Possibly broken as of the implementation of paging. I though memory mapped I/O was supposed to make things easier ):
+ * (c) 2019 Zachary James Schlotman
+ */
 #include <mem.h>
 extern int strncmp(const char *str1,const char *str2,unsigned int n);
 #include <lib.h>
 #include <llfs.h>
+//Wrapper for ata reader to only read on file system. The value at 0x00000103 will be what I use to implement mounting llfs file systems
 int llfs_ata_read_master(void *buf, uint32_t lba,uint16_t drive,uint8_t slave){
 	return ata_read_master(buf,lba+*(uint32_t*)0x103,drive,slave);
 }
+//Seperates dir into array of character pointers seperated by the token c
 char **sep(const char *dir,char c){
 	int i = 0;
 	int j = 0;
@@ -39,7 +46,7 @@ char **sep(const char *dir,char c){
 	ret[k] = 0;
 	return ret;
 }
-
+//Low level Open directory function
 struct Entry *__opendir(const char *dir){
 #ifdef __FS_DEBUG
 	puts("Opening directory:");
@@ -85,6 +92,7 @@ a:;while(1){
 	llfs_ata_read_master(buf,ent->nxtlba,*(uint16_t*)0x100,*(uint8_t*)0x102);
 	goto a;	
 }
+//Gets the address space for file descriptors
 struct llfd *getAddressSpace(){
 	if(*(uint8_t*)0x200 == 1){
 		return (struct llfd*)*(uint32_t*)0x201;
@@ -100,12 +108,14 @@ struct llfd *getAddressSpace(){
 	pntr->nxt->nxt = 0;
 	return (struct llfd*)*(uint32_t*)0x201;
 }
+//gets the associated structure from a file descriptor
 struct llfd *getllfd(int llfd){
 	struct llfd *pntr = getAddressSpace();
 	for(int i = 0; i < llfd-STDIN-1;i++)
 		pntr = pntr->nxt;
 	return pntr;
 }
+//Allocates a structure for a file descriptor
 struct llfd *allocllfd(){
 	struct llfd *pntr = getAddressSpace();
 	int i = STDIN+1;
@@ -116,6 +126,7 @@ struct llfd *allocllfd(){
 	bzero(pntr->nxt,sizeof(*pntr->nxt));
 	return pntr->nxt;
 }
+//gets the associated file descriptor from a structure
 int getLLFD(struct llfd *l){
 	struct llfd *pntr = getAddressSpace();
 	int i = STDIN+1;
@@ -127,6 +138,7 @@ int getLLFD(struct llfd *l){
 	}
 	return i;
 }
+//You already know who it is
 char *substring(char *a, int b,int c){
 	int i = b;
 	char *ret = malloc(c-b+1);
@@ -136,18 +148,21 @@ char *substring(char *a, int b,int c){
 	return ret;
 
 }
+//Strip function for some dogy code I wrote further down
 void strip(char *a){
 	int i = strlen(a)-1;
 	while(a[i] == '/')
 		i--;
 	a[i+1] = 0;
 }
+//Find the final character for the same dodgy code
 int finc(const char *str,char c){
 	for(int i = strlen(str)-1; i >= 0;i--)
 		if(str[i] == c)
 			return i;
 	return -1;
 }
+//Returns string from [foc, strlen(str)-1]
 char* fins(const char *str,char c){
 	int i = strlen(str)-1;
 	char *ret = malloc(strlen(str)-finc(str,c));
@@ -161,6 +176,7 @@ char* fins(const char *str,char c){
 	}
 	return ret;
 }
+//Standard open but without the POSIX compliance. God damn PDFs cost like $100
 int open(const char *_file,int options){
 	char *file = malloc(strlen(_file));
 	bzero(file,strlen(_file));
@@ -200,9 +216,11 @@ int open(const char *_file,int options){
 	llfd->t = options;
 	return getLLFD(llfd);	
 }
+//I need to work on these
 int abs(int n){
 	return n < 0 ? n*-1 : n;
 }
+//Low level read function but I guess it's just the read function for the userland. See isr.asm and libc for that
 int llread(int fd,char *buf,unsigned int n){
 	if(fd < 0)
 		return -1;
@@ -236,6 +254,7 @@ int llread(int fd,char *buf,unsigned int n){
 
 	return j;
 }
+//Returns file size
 int fsize(int fd){
 	if(fd < 0)
 		return -1;

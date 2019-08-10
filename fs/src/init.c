@@ -3,9 +3,8 @@
 #include <stdlib.h>
 #include <debug.h>
 int main(int argc,char *argv[]){
-	puts("CRITTER init\n");
-	puts("Dropping into shell for now...\n");
-
+	breakpoint();
+	debug("init","primitive init system not implemented, dropping into shell instead");
 	while(1){
 		puts(">");
 		char *command = gets(STDIN);

@@ -1,4 +1,5 @@
 #include "lib.h"
+//Some inline shit
 uint8_t inb(uint16_t port)
 {
     uint8_t ret;

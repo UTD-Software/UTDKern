@@ -1,3 +1,7 @@
+/*
+ * converts directory to file system image
+ * do not ask me how this works
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

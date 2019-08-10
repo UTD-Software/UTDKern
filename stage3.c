@@ -12,6 +12,7 @@ void bzero(void *buf,unsigned int n){
 int main(){
 	clear();
 	init_page();
+	memory_init();
 	*(uint8_t*)0x600 = 0xc3;
 //	setMode(getMode(1920,1080,24));
 //	int10h_ldr();
@@ -19,7 +20,7 @@ int main(){
 	puts(CPU);
 	puts("\nKernel ");
 	puts(KVERSION);
-	puts(" loading...");
+	debug("kernel","looking for llfs file system");
 	char *buf = malloc(1024);
 	bzero(buf,1024);
 	uint8_t slavebit = -1;
@@ -62,6 +63,7 @@ int main(){
 	}
 	puts("No devices Found!\n");
 a:;
+  	debug("kernel","found file system");
 	*(uint16_t*)0x100 = drive;
 	*(uint8_t *)0x102 = slavebit;
 	free(buf);
@@ -72,8 +74,8 @@ a:;
 	const char *str = "Interupts work!\n";
 	asm("mov %0,%%ebx" : :"m"(str));
 	asm("mov $1,%ah");
-	asm("int $0x80");
-	char *arr[] = {"/init"};
+	asm("int $0x80");	char *arr[] = {"/init"};
+	debug("kernel","passing control to init");
 	exec(arr[0],1,arr);
 	panic("Nothing to do");
 }
@@ -82,10 +84,12 @@ void breakpoint(){
 	func();
 }
 void panic(char *message){
-	puts("panic(");
+	puts("\npanic(");
 	puts(message);
-	puts(")\nA fatal error has occured\n");
-	asm("cli");
-	asm("hlt");
+	puts(")\nA fatal error has occured.\n");
+	while(1){
+		asm("hlt");
+	}
+
 }
 

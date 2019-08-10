@@ -1,4 +1,4 @@
-OBJS=puts.o crt0.o malloc.o exec.o crti.o crtn.o breakpoint.o putc.o sep.o bzero.o putx.o string.o gets.o getc.o free.o
+OBJS=puts.o crt0.o malloc.o exec.o crti.o debug.o crtn.o breakpoint.o putc.o sep.o bzero.o putx.o string.o gets.o getc.o free.o
 LIBS=libc.a
 CC=i386-elf-gcc
 AS=nasm
@@ -6,6 +6,8 @@ AR=i386-elf-ar
 CFLAGS=-Iinclude -nostdlib -ffreestanding
 all:
 	@rm -f *.a *.o
+	@echo "(CC) ${PWD}/debug.o"
+	@${CC} -c debug.c -o debug.o ${CFLAGS}
 	@echo "(AS) ${PWD}/crti.o"
 	@${AS} -f elf crti.asm -o crti.o
 	@echo "(AS) ${PWD}/crtn.o"

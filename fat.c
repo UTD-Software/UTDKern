@@ -1,3 +1,6 @@
+/*
+ *Unused
+ */
 #include "lib.h"
 #include "fat.h"
 #include "mbr.h"

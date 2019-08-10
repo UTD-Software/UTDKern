@@ -1,3 +1,6 @@
+/*
+ * Old kernel main should probably delete but that will make git all fussy
+ */
 #include <lib.h>
 #include <video.h>
 void io_error(){
