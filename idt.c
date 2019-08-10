@@ -49,10 +49,10 @@ void idt(){
 	idt[0x80].offset_2 = (uint16_t)(0x15000 >> 16);
 	idt[0x80].selector = 0x8;
 	idt[0x80].type_attr = 0b10001110;
-	uint32_t paddr = (uint32_t)ehandle;
+	uint32_t paddr = (uint32_t)panic;
 	for(int i = 0 ; i < 0x20;i++){
-		idt[i].offset_1 = ((paddr + 0x10*i) & 0xffff);
-		idt[i].offset_2 = ((paddr + 0x10*i) >> 16) & 0xffff;
+		idt[i].offset_1 = (uint16_t)(paddr);
+		idt[i].offset_2 = (uint16_t)(paddr >> 16);
 		idt[i].selector = 0x8;
 		idt[i].type_attr = 0b10001110;
 	}
@@ -61,6 +61,7 @@ void idt(){
 	inf.pntr = idt;
 	asm("lidt %0" : :"m"(inf));
 }
+
 void irq(){
 	struct IDTDescr *irq = (struct IDTDescr *)malloc(sizeof(*idt)*256);
 }

@@ -71,6 +71,7 @@ a:;
 	ata_read_master(buf,0,*(uint16_t*)0x100,*(uint8_t*)0x102);
 	*(uint32_t*)0x103 = *(uint32_t*)(buf + 0x1be);
 	idt();
+
 	const char *str = "Interupts work!\n";
 	asm("mov %0,%%ebx" : :"m"(str));
 	asm("mov $1,%ah");

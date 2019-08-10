@@ -19,18 +19,14 @@ int init_page(){
 		paget[i] = addr | 0b11;
 	}
 	paged[0] = 0b11 | (uint32_t)paget;
-	addr = 0x800000;
-	for(int i = 1; i < 5;i++){
-		uint32_t _paget[1024] __attribute__((aligned(4096)));
-		for(int j = 0; j < 1024;j++,addr+=4096){
-			_paget[j] = addr | 0b11;
-		}
-		paged[i] = (uint32_t)_paget | 0b11;
+	uint32_t _paget[1024]__attribute__((aligned(4096)));
+	for(int i = 0; i < 1024;i++,addr+=4096){
+		_paget[i] = addr | 3;
 	}
+	paged[1] = 0b11 | (uint32_t)_paget;
 	ldpgd(paged);
 	puts("Paging enabled\n");
 	map_page(0x400000,0xC0000000);
-	map_page(0x800000,0xC0400000);
 	curraddr = 0xF00000;
 	naddr = curraddr+4096*1024;
 }
@@ -62,28 +58,31 @@ void map_page(uint32_t paddr,uint32_t vaddr){
 	if(paged[indx] != 1)
 		return;
 	paged[indx] = (uint32_t)pt|3;
-	ldpgd(paged);
+//	ldpgd(paged);
 	debug("paget","Registered page directory");
 }
 void alloc_page(uint32_t vaddr){
-	uint32_t indx = vaddr/1024/4096;
 	uint32_t pt[1024]__attribute__((aligned(4096)));
-	for(int i = 0; i < 1024;i++,curraddr+=4096){
-		pt[i] = (curraddr & 0xffffff00) | 3;
+	for(int i = 0; i < 1024;i++,vaddr+=4096){
+		pt[i] = vaddr | 0b11;
 	}
-	if(paged[indx] != 1)
-		return;
-	paged[indx] = ((uint32_t)pt & 0xffffff00) | 3;
+	if(paged[vaddr/1024/4096] == 1)
+		paged[vaddr/1024/4096]=vaddr|0b11;
+//	ldpgd(paged);
 }
 void *allocNewPage(){
 	uint32_t indx = 0;
-	for(int i = 0x10; i < 1024;i++)
+	for(int i = 0x100; i < 1024;i++)
 		if(paged[i] == 1){
 			indx = i;
 			break;
 		}
-	putx(indx);
-	alloc_page(indx*4096*1024);
+	uint32_t pt[1024]__attribute__((aligned(4096)));
+	for(int i = 0 ; i < 1024;i++,curraddr+=4096){
+		pt[i] = curraddr | 3;
+	}
+	paged[indx] = (uint32_t)pt | 3;
+//	ldpgd(paged);
 	return (void*)(indx*4096*1024);
 }
 

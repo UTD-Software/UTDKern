@@ -46,9 +46,9 @@ void *malloc(unsigned short size){
 void *malloc(unsigned long size){
 	if(size == 0)
 		return malloc(1);
-	struct Mem *pntr = (struct Mem*)(*userbit? usermem : 0xC0000000);
+	struct Mem *pntr = (struct Mem*)(userbit ? usermem : 0xC0000000);
 	while(1){
-		if(((uint32_t)pntr + size) < (*userbit ? usermem : 0xC0000000)){
+		if(((uint32_t)pntr + size) < (userbit ? usermem : 0xC0000000)){
 			puts("Out of memory\n");
 			puts("Size:0x");
 			putx(size);
