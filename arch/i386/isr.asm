@@ -10,6 +10,7 @@ extern putc
 extern getc
 extern putx
 extern sep
+extern clear
 extern open
 extern llfs_ata_read_master
 extern __opendir
@@ -41,6 +42,9 @@ cmp ah,0x0c
 je readSector
 cmp ah,0x0d
 je _open
+cmp ah,0x0e
+je _clear
+pop ebp
 iret
 _putc:
 push ebx
@@ -123,5 +127,9 @@ push ecx
 push ebx
 call open
 add esp,8
+pop ebp
+iret
+_clear:
+call clear
 pop ebp
 iret

@@ -68,7 +68,7 @@ char* x2p(int i){
 	int size = xlen(i)-1;
 	int j =0;
 	if(i == 0){
-		return "Error";
+		return "0";
 	}
 	while(i >= 0){
 		int c = i % 16;

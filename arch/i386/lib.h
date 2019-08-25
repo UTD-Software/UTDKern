@@ -64,6 +64,7 @@ void int10h_ldr();
 short bios_readdisk(void *pntr,uint8_t drive,uint8_t head,uint8_t sector,uint8_t cylinder);
 void _bios_readdisk(void *pntr,uint8_t drive,uint8_t tsect,uint8_t c,uint8_t h,uint8_t s);
 uint8_t inb(uint16_t io);
+uint16_t inw(uint16_t io);
 void outb(uint16_t io,uint8_t v);
 char *x2p(int i);
 #endif

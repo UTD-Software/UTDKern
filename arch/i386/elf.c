@@ -28,7 +28,9 @@ void bzero(void *pntr,unsigned int n){
 		*((uint8_t*)pntr + i)= 0;
 }
 //Remnents from the early days
+
 void _io_error(){
+
 	*(uint8_t*)0xb8000 = 'E';
 	*(uint8_t*)0xb8001 = 15;
 }
@@ -48,7 +50,9 @@ void load_stage3_1(){
 		bios_readdisk(buf,*(uint8_t*)0x50,0,i,0);
 		
 		if(buf[0] == 0x7f && buf[1] == 'W' && buf[2] == 'O' && buf[3] == 'R' && buf[4] == 'M'){
-			_bios_readdisk(0xA000,*(uint8_t*)0x50,47,0,0,i+buf[5]+1);
+			 _bios_readdisk(0xA000,*(uint8_t*)0x50,47,0,0,i+buf[5]+1);
+			//if(ret < 0)
+			//	puts("Error");
 			_bios_readdisk(0xF000,*(uint8_t*)0x50,buf[5],0,0,i+1);
 			puts("Exec\n");
 			break;

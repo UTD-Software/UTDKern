@@ -1,6 +1,6 @@
 OBJS = objs/stage2.o main.o objs/ulcmp.o  objs/getc.o objs/putc.o objs/elf.o objs/memcmp.o objs/gdt.o objs/memcpy.o  objs/getc.o objs/fat.o  objs/readdisk.o objs/string.o objs/malloc.o objs/puts.o objs/test.o objs/main.o objs/disk.o objs/getDiskGeo.o objs/bzero.o objs/writedisk.o
-STAGE3_OBJS = stage3.o inline.o v8086.o idt.o ldr.o mem.o isr.o input.o llfs.o tmpfs.o memcmp.o string.o puts.o math.o objs/tty.o ata.o malloc.o 
-LIBK_OBJS =  crt0.o cursor.o
+STAGE3_OBJS = inline.o cursor.o ldr.o llfs.o memcmp.o string.o puts.o math.o objs/tty.o input.o ata.o malloc.o 
+LIBK_OBJS =  ${STAGE3_OBJS} crt0.o mem.o isr.o idt.o
 MATH_OBJS = math.o
 BINS = *.a *.bin *.elf *.img
 ASM=nasm
@@ -31,7 +31,9 @@ all:
 	@echo "(AS) ${PWD}/v8086.o"
 	@${ASM} -f elf v8086.asm -o v8086.o
 	@echo "(AS) ${PWD}/ata.o"
-	@${ASM} -f elf ata.asm -o ata.o 
+	@${ASM} -f elf ata.asm -o ata.o
+#	@echo "(AS) ${PWD}/ata.o"
+#	@${ASM} -f elf ata.asm -o ata.o 
 	@echo "(CC) ${PWD}/objs/tty.o"
 	@${CC}  -c tty.c -o objs/tty.o ${CFLAGS_X86_32}
 	@echo "(AS) ${PWD}/objs/ulcmp.o"
@@ -114,6 +116,7 @@ all:
 	@echo "Padding binaries..."
 	@./pad stage2.2.bin
 	@echo "finsig"
+	@ls -l stage2.2.bin
 	@./finsig sig.bin stage2.2.bin 
 	@./pad test2.bin
 	@echo "****stage2 build complete****"
@@ -125,8 +128,6 @@ all:
 	@${CC} -c crt0.c -o crt0.o
 	@echo "(CC) ${PWD}/cursor.o"
 	@${CC} -c cursor.c -o cursor.o ${CFLAGS_X86_32}
-	@echo "(AR) ${PWD}/libk.a"
-	@${PREFIX}ar rcs libk.a ${LIBK_OBJS}
 	@echo "(CC) ${PWD}/math.o"
 	@${CC} -c math.c -o math.o -I. ${CFLAGS_X86_32}
 	@echo "(AR) ${PWD}/libm.a"
@@ -150,8 +151,8 @@ all:
 	@echo "(CC) ${PWD}/idt.o"
 	@${CC} -c idt.c -o idt.o -Wno-error ${CFLAGS_X86_32} -Wno-error
 	@echo "(LD) ${PWD}/stage3.elf"
-	@${CC} ${STAGE3_OBJS} -L. -lk -nostdlib -ffreestanding ${LDFLAGS_X86_32} -o stage3.elf -Tlinker.2.ld
-	@cp *.bin *.elf objs/*.o fs/kern
+	@${CC} crt0.o stage3.o ${STAGE3_OBJS} -L.  -nostdlib -ffreestanding ${LDFLAGS_X86_32} -o stage3.elf -Tlinker.2.ld
+	
 	@echo "(INSCRIBE FILE SYSTEM) ${PWD}/fs.img"
 	@./llfs.inscribe fs.img fs
 	@echo "(CATBOOTDISK) ${PWD}/critter.img"
@@ -159,9 +160,14 @@ all:
 	@echo "(CC_HOST) ${PWD}/genimg.o"
 	@gcc -c genimg.c -o genimg.o
 	@echo "(LD_HOST) ${PWD}/genimg"
+	@echo "(AR) libk.a"
+	@${AR} rcs libk.a ${LIBK_OBJS}
+	@cp libk.a fs/usr/lib
+	@make -C fs/kern
 	@gcc genimg.o -o genimg
 	@echo "(GENIMG) ${PWD}/critter.img"
 	@./genimg critter.img fs.img
+	
 clean:
 	@echo "(CLEAN) ${OBJS}"
 	@rm -f ${OBJS}

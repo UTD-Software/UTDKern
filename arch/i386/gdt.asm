@@ -25,6 +25,10 @@ sidt [0x400]
 lgdt [gdtr]
 mov eax,cr0
 or eax,1
+mov ebx,1
+shl ebx,31
+not ebx
+and eax,ebx
 mov cr0,eax
 mov esp,0x9000
 mov ebp,esp

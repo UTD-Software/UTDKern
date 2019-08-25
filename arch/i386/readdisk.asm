@@ -1,3 +1,6 @@
+section .data
+msg:db 'I/O Error',0xa,0
+section .text
 global _bios_readdisk
 extern _puts
 extern _io_error
@@ -16,7 +19,7 @@ mov ch,[bp+12]
 int 0x13
 cmp ax,1
 je r
-call _io_error
+call io_error
 r:pop bp
 ret
 global __bios_readdisk
@@ -35,5 +38,10 @@ mov cl,[bp+14]
 int 0x13
 cmp ah,0
 je r
-call _io_error
+call io_error
 jmp r
+io_error:
+mov ah,0x0e
+mov al,'E'
+int 0x10
+hng:jmp hng

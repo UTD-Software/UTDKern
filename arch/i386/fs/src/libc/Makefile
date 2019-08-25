@@ -1,4 +1,4 @@
-OBJS=puts.o open.o crt0.o read.o malloc.o opendir.o exec.o crti.o debug.o readSector.o crtn.o breakpoint.o putc.o sep.o bzero.o putx.o string.o gets.o getc.o free.o
+OBJS=puts.o open.o clear.o crt0.o read.o malloc.o opendir.o exec.o crti.o debug.o readSector.o crtn.o breakpoint.o putc.o sep.o bzero.o putx.o string.o gets.o getc.o free.o
 LIBS=libc.a
 CC=i386-elf-gcc
 AS=nasm
@@ -44,6 +44,8 @@ all:
 	@${CC} -c readSector.c -o readSector.o ${CFLAGS}
 	@echo "(CC) ${PWD}/read.o"
 	@${CC} -c read.c -o read.o ${CFLAGS}
+	@echo "(CC) ${PWD}/clear.o"
+	@${CC} -c clear.c -o clear.o ${CFLAGS}
 	@echo "(CC) ${PWD}/open.o"
 	@${CC} -c open.c -o open.o ${CFLAGS}
 	@echo "(AR) ${PWD}/libc.a"

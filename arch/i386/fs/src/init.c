@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <debug.h>
 int main(int argc,char *argv[]){
-	breakpoint();
+
+
 	debug("init","primitive init system not implemented, dropping into shell instead");
 	while(1){
 		puts(">");

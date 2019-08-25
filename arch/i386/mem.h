@@ -3,7 +3,7 @@
 #ifdef __PM
 #include <stdint.h>
 
-static uint8_t *usermem;
+static uint8_t **usermem;
 #endif
 void *malloc(unsigned long n);
 void free(void *pntr);
@@ -15,6 +15,7 @@ void memory_init();
 void program_memory_init();
 void program_memory_destroy();
 void dealloc_page(uint32_t addr);
-static uint32_t userbit;
+static uint32_t *userbit;
+void displayPD();
 #endif
 #endif

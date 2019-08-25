@@ -46,13 +46,13 @@ void *malloc(unsigned short size){
 void *malloc(unsigned long size){
 	if(size == 0)
 		return malloc(1);
-	struct Mem *pntr = (struct Mem*)(userbit ? usermem : 0xC0000000);
+	struct Mem *pntr = 0x1000000;
 	while(1){
-		if(((uint32_t)pntr + size) < (userbit ? usermem : 0xC0000000)){
+		if(((uint32_t)pntr + size) < 0x1000000){
 			puts("Out of memory\n");
-			puts("Size:0x");
+			puts("Size:");
 			putx(size);
-			puts(" pntr=0x");
+			puts(" pntr=");
 			putx((uint32_t)pntr);
 			puts("\n");
 			return 0;
@@ -82,12 +82,12 @@ void free(void *mem){
 #ifdef __PM
 	if(pntr->alloc != 1){
 		if(pntr->alloc == 0){
-			puts("Memory Exception: Double free pntr 0x");
+			puts("Memory Exception: Double free pntr ");
 			putx(pntr+sizeof(struct Mem));
 			puts("Press any key to continue\n");
 			getc(STDIN);
 		}else{
-			puts("Memory Exception: Freeing Invalid pntr 0x");
+			puts("Memory Exception: Freeing Invalid pntr ");
 			putx(pntr+sizeof(struct Mem));
 			puts("Press any key to continue\n");
 			getc(STDIN);

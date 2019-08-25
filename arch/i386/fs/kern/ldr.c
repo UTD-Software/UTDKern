@@ -20,20 +20,19 @@ void int10h_ldr(){
 //Name says it. Specify path, argument count, and array of arguments
 void exec(const char *path,int argc, char *argv[]){
 #ifdef DEBUG
-	debug("kernel-exec",path);
+	debug("pgrmldr",path);
 #endif
 	
 	int fd = open(path,O_RDWR);
 	if(fd < 0)
 		return;
-
 	uint8_t *buf = malloc(fsize(fd));
 	int r = llread(fd,buf,fsize(fd));
 	Elf32_Ehdr *ehdr = (Elf32_Ehdr *)buf;
 	Elf32_Phdr *phdr = (Elf32_Phdr *)(buf + ehdr->e_phoff);
 	int size = 0;
 	for(int i = 0; i < ehdr->e_phnum;i++){
-
+		map_page(phdr[i].p_vaddr,phdr[i].p_vaddr);
 		memcpy((void*)(phdr[i].p_paddr),buf + phdr[i].p_offset,phdr[i].p_memsz);
 #ifdef DEBUG
 		puts("{");
@@ -50,8 +49,17 @@ void exec(const char *path,int argc, char *argv[]){
 	putx(ehdr->e_entry);
 	puts("");
 #endif
-
 	void (*func)()= (void (*))(ehdr->e_entry);
+
+	breakpoint();
+
+	program_memory_init();
+	*userbit = 1;
+#ifdef DEBUG
+	puts("()\n");
+#endif
 	func(argc,argv);
 //	userbit = 0;
+	program_memory_destroy();
+	breakpoint();
 }

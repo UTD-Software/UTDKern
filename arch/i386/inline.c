@@ -1,5 +1,10 @@
 #include "lib.h"
 //Some inline shit
+uint16_t inw(uint16_t port){
+	uint16_t ret;
+	asm ("inw %1 ,%0" : "=a"(ret) : "Nd"(port));
+	return ret;
+}
 uint8_t inb(uint16_t port)
 {
     uint8_t ret;
